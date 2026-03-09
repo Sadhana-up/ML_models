@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>House Price Predictor</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <div class="header">
+          <h1>House Price Predictor</h1>
+          <p class="subtitle">
+            Get an accurate price estimate for your property
+          </p>
+        </div>
+
+        <form id="predictionForm" class="form">
+          <!-- Location Section -->
+          <fieldset class="form-section">
+            <legend>Location</legend>
+            <div class="form-group">
+              <label for="location">Select Location:</label>
+              <select id="location" required>
+                <option value="">Choose a location...</option>
+                <option value="kathmandu">Kathmandu</option>
+                <option value="lalitpur">Lalitpur</option>
+                <option value="pokhara">Pokhara</option>
+                <option value="bhaktapur">Bhaktapur</option>
+              </select>
+            </div>
+          </fieldset>
+
+          <!-- Property Details Section -->
+          <fieldset class="form-section">
+            <legend>Property Details</legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="land_area">Land Area (sq units):</label>
+                <input type="number" id="land_area" step="0.01" required />
+              </div>
+              <div class="form-group">
+                <label for="square_feet">Square Feet:</label>
+                <input type="number" id="square_feet" step="0.01" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="floors">Floors:</label>
+                <input type="number" id="floors" step="1" required />
+              </div>
+              <div class="form-group">
+                <label for="bedrooms">Bedrooms:</label>
+                <input type="number" id="bedrooms" step="1" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="bathrooms">Bathrooms:</label>
+                <input type="number" id="bathrooms" step="1" required />
+              </div>
+              <div class="form-group">
+                <label for="windows">Windows:</label>
+                <input type="number" id="windows" step="1" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="doors">Doors:</label>
+                <input type="number" id="doors" step="1" required />
+              </div>
+              <div class="form-group">
+                <label for="cement_bags">Cement Bags:</label>
+                <input type="number" id="cement_bags" step="0.01" required />
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- Materials & Infrastructure Section -->
+          <fieldset class="form-section">
+            <legend>Materials & Infrastructure</legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="RCC_structure">RCC Structure:</label>
+                <input type="number" id="RCC_structure" step="0.01" required />
+              </div>
+              <div class="form-group">
+                <label for="plumbing">Plumbing:</label>
+                <input type="number" id="plumbing" step="0.01" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="electricity">Electricity:</label>
+                <input type="number" id="electricity" step="0.01" required />
+              </div>
+            </div>
+          </fieldset>
+
+          <button type="submit" class="btn-submit">Predict Price</button>
+        </form>
+
+        <!-- Result Section -->
+        <div id="result" class="result hidden">
+          <div class="result-content">
+            <p class="result-label">Estimated Price</p>
+            <p class="result-value" id="resultValue">NPR 0</p>
+            <button type="button" class="btn-reset" onclick="resetForm()">
+              Make Another Prediction
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading" class="loading hidden">
+          <div class="spinner"></div>
+          <p>Calculating price estimate...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="error" class="error hidden"></div>
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("predictionForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          await makePrediction();
+        });
+
+      async function makePrediction() {
+        const location = document.getElementById("location").value;
+
+        if (!location) {
+          showError("Please select a location");
+          return;
+        }
+
+        // Create location flags
+        const locationFlags = {
+          location_Kathmandu: location === "kathmandu" ? 1 : 0,
+          location_Lalitpur: location === "lalitpur" ? 1 : 0,
+          location_Pokhara: location === "pokhara" ? 1 : 0,
+          location_Bhaktapur: location === "bhaktapur" ? 1 : 0,
+        };
+
+        const features = {
+          ...locationFlags,
+          land_area: parseFloat(document.getElementById("land_area").value),
+          square_feet: parseFloat(document.getElementById("square_feet").value),
+          floors: parseFloat(document.getElementById("floors").value),
+          bedrooms: parseFloat(document.getElementById("bedrooms").value),
+          bathrooms: parseFloat(document.getElementById("bathrooms").value),
+          windows: parseFloat(document.getElementById("windows").value),
+          doors: parseFloat(document.getElementById("doors").value),
+          cement_bags: parseFloat(document.getElementById("cement_bags").value),
+          RCC_structure: parseFloat(
+            document.getElementById("RCC_structure").value,
+          ),
+          plumbing: parseFloat(document.getElementById("plumbing").value),
+          electricity: parseFloat(document.getElementById("electricity").value),
+        };
+
+        showLoading();
+        hideError();
+        hideResult();
+
+        try {
+          const response = await fetch("http://localhost:8000/predict", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(features),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to get prediction");
+          }
+
+          const data = await response.json();
+          displayResult(data.predicted_total_price);
+        } catch (error) {
+          showError(
+            "Error: " +
+              error.message +
+              ". Make sure the API is running on http://localhost:8000",
+          );
+        } finally {
+          hideLoading();
+        }
+      }
+
+      function displayResult(price) {
+        const formattedPrice = new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "NPR",
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }).format(price);
+
+        document.getElementById("resultValue").textContent = formattedPrice;
+        showResult();
+      }
+
+      function showLoading() {
+        document.getElementById("loading").classList.remove("hidden");
+      }
+
+      function hideLoading() {
+        document.getElementById("loading").classList.add("hidden");
+      }
+
+      function showResult() {
+        document.getElementById("result").classList.remove("hidden");
+      }
+
+      function hideResult() {
+        document.getElementById("result").classList.add("hidden");
+      }
+
+      function showError(message) {
+        const errorEl = document.getElementById("error");
+        errorEl.textContent = message;
+        errorEl.classList.remove("hidden");
+      }
+
+      function hideError() {
+        document.getElementById("error").classList.add("hidden");
+      }
+
+      function resetForm() {
+        document.getElementById("predictionForm").reset();
+        hideResult();
+        hideError();
+      }
+    </script>
+  </body>
+</html>
