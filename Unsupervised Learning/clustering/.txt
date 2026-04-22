@@ -1,0 +1,6 @@
+Clustering : 
+K means clustering : where K is number of clusters 
+Each Cluster is associated with a centriod value 
+- Used in Recommendation System
+- Search Engines 
+- Insurance Fraud Detection
