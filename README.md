@@ -1,6 +1,38 @@
-# ML_models
-Some widely used ML models for both supervised &amp; unsupervised learning
+# Machine Learning with Scikit-learn
 
+This repo contains some machine learning models I explored using scikit-learn.
 
-1. Supervised Learning : learn through labels(outputs)
-   - KNN ( K- Nearest Neighbout) is used for the basketball data so as to predict a player is a HOF ( Hall of Fames) or not
+## Models Included
+
+### Supervised Learning
+
+* KNN
+* Logistic Regression
+* Linear Regression
+* Decision Tree
+* Random Forest
+
+### Unsupervised Learning
+
+* K-Means Clustering
+
+## Tools Used
+
+* Python
+* NumPy
+* Pandas
+* Matplotlib
+* Scikit-learn
+
+## Run
+
+```bash id="7z8jtm"
+pip install -r requirements.txt
+python filename.py
+```
+
+## Why this repo?
+
+Just a place to practice machine learning basics, understand how different models work, and compare them.
+
+More models will be added later 
