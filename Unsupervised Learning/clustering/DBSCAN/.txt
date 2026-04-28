@@ -1,0 +1,9 @@
+WHY DBSCAN ? Density Based Spatial Clustering of Application with Noise
+
+KMeans is sensitive to outliers 
+We need to manually specify clusters 
+
+Density Based clustering method 
+datapoints are clustered on the basis of dense area via sparse region
+
+

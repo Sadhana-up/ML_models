@@ -4,3 +4,7 @@ Each Cluster is associated with a centriod value
 - Used in Recommendation System
 - Search Engines 
 - Insurance Fraud Detection
+
+-Use centroid based clustering 
+-Centriod changes if there is a presence of outliers 
+

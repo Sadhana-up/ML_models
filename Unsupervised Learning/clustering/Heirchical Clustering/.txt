@@ -1,0 +1,5 @@
+-No need †o specify the number of cluster initially 
+Hierarchical clustering groups data points based on their similarity (distance)
+
+A. Agglomerative (Bottm up )
+B. Divisive (Top_down)
